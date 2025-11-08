@@ -1,0 +1,39 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Docker data (volumes, bases de données persistantes)
+docker_data/
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE/editor files (WebStorm / JetBrains)
+.idea/
+*.iml
+*.iws
+out/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Optional: coverage reports
+coverage/
+.nyc_output/

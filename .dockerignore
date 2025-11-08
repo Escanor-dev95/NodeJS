@@ -1,0 +1,22 @@
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Docker data (volumes persistants)
+docker_data
+
+# Git
+.git+
+.gitignore
+
+# IDE / JetBrains / WebStorm
+.idea
+.vscode
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output
+dist
