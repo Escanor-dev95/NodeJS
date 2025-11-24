@@ -12,6 +12,9 @@ RUN npm install
 # 4. Copier le reste du code
 COPY . .
 
+# Installer ts-node global ou comme dépendance
+RUN npm install -g ts-node typescript
+
 # 5. Exposer le port interne
 EXPOSE 3002
 

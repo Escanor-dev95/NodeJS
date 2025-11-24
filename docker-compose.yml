@@ -7,57 +7,28 @@ services:
     ports:
       - "${API_PORT}:${API_PORT}"
     environment:
-      # Définition des variables d'environnement utilisées par l'application web
-      - DATABASE_URL=${DATABASE_URL}  # URL pour se connecter à PostgreSQL
+      MONGODB_URI: ${MONGODB_URI}
     env_file:
       - .env
     volumes:
       - .:/app
-      - node_modules:/app/node_modules  # dépendances persistantes
+      - /app/node_modules
     networks:
       - app_network
     depends_on: # Dépendances de démarrage pour le service
-      db:
-        condition: service_healthy # Attend que le service `db` soit sain avant de démarrer
+      - mongo
 
-  db:  # Nom du service pour la base de données PostgreSQL
-    image: postgres:14
-    container_name: postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}  # Nom d'utilisateur pour PostgreSQL, défini dans les variables d'environnement
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Mot de passe pour PostgreSQL
-      POSTGRES_DB: ${POSTGRES_DB}  # Nom de la base de données initiale à créer
-    volumes:
-      # Volume pour stocker les données PostgreSQL afin d'assurer la persistance des données
-      - ./docker_data/dev/postgres_data:/var/lib/postgresql/data
-    healthcheck: # Vérifie l'état de santé de PostgreSQL
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"] # Vérifie si la base est accessible
-      interval: 10s  # Vérifie toutes les 10 secondes
-      timeout: 5s  # Considère un échec si aucune réponse en 5 secondes
-      retries: 20  # Réessaye jusqu'à 20 fois avant de marquer le service comme non fonctionnel
-    restart: always  # Redémarre automatiquement en cas d'arrêt ou d'échec
-    networks:
-      - app_network
-
-  pgadmin: # Nom du service pour l'interface graphique de gestion PostgreSQL
-    image: dpage/pgadmin4
-    container_name: pgadmin
+  mongo:
+    image: mongo:6
+    container_name: mongodb
     ports:
-      - "${PGADMIN_PORT}:80"  # Mappe le port 80 du conteneur au port défini (ex: 5050) sur l'hôte
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}  # Email par défaut pour accéder à PgAdmin
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}  # Mot de passe pour l'email administrateur
-      TZ: Europe/Paris  # Définit le fuseau horaire à Europe/Paris
-    depends_on: # Spécifie que PgAdmin dépend de PostgreSQL
-      - db  # Assure que le service `db` démarre avant `pgadmin`
-    restart: always  # Redémarre automatiquement en cas d'arrêt ou d'échec
+      - "${MONGO_PORT}:${MONGO_PORT}"
     volumes:
-      # Volume pour stocker les données persistantes de PgAdmin
-      - ./docker_data/dev/pgadmin_data:/var/lib/pgadmin
+      - mongo_data:/data/db
     networks:
       - app_network
 
+volumes:
+  mongo_data:
 networks:
   app_network:
-volumes:
-  node_modules:
