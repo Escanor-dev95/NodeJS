@@ -4,9 +4,9 @@ import {getUsers, createUser, updateUser, deleteUser, getUser} from "../controll
 const router = express.Router();
 
 router.get("/", getUsers);
-router.get("/:user_id", json() ,getUser);
+router.get("/:id", json() ,getUser);
 router.post("/", createUser);
-router.put("/:user_id", json() ,updateUser);
-router.delete("/:user_id", json() ,deleteUser);
+router.put("/:id", json() ,updateUser);
+router.delete("/:id", json() ,deleteUser);
 
 export default router;

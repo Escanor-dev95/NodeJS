@@ -1,6 +1,6 @@
 import {Schema} from "mongoose";
 
-export interface User {
+export interface UserInterface {
     name: string;
     email: string;
     password: string;
@@ -9,8 +9,8 @@ export interface User {
     role: Schema.Types.ObjectId;
 }
 
-export function getUserSchema() : Schema<User>{
-    return new Schema<User>({
+export function getUserSchema() : Schema<UserInterface>{
+    return new Schema<UserInterface>({
         name : {
             type : String,
             required : true,

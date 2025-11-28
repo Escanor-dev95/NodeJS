@@ -1,11 +1,11 @@
 import {Schema} from "mongoose";
 
-export interface Role {
+export interface RoleInterface {
     name: string;
 }
 
-export function getRoleSchema() : Schema<Role>{
-    return new Schema<Role>({
+export function getRoleSchema() : Schema<RoleInterface>{
+    return new Schema<RoleInterface>({
         name : {
             type : String,
             required : true,
