@@ -1,17 +1,21 @@
 import {Schema} from "mongoose";
 
 export interface User {
-    nickname: string;
+    name: string;
+    email: string;
     password: string;
     isActive: boolean;
+    score : number;
+    role: Schema.Types.ObjectId;
 }
 
 export function getUserSchema() : Schema<User>{
-    // new Schema
-    // 1er paramètre -> La definition de la collection
-    // 2eme paramètre -> les options
     return new Schema<User>({
-        nickname : {
+        name : {
+            type : String,
+            required : true,
+        },
+        email : {
             type : String,
             required : true,
             unique : true
@@ -24,10 +28,18 @@ export function getUserSchema() : Schema<User>{
             type : Boolean,
             default: true
         },
+        score : {
+            type : Number,
+            default : 0
+        },
+        role: {
+            type: Schema.Types.ObjectId,
+            ref: "Role",
+            required: true
+        }
     }, {
         versionKey : false,
-        // nom de la table dans mongodb
-        collection : "user",
+        collection : "users",
         timestamps : {
             updatedAt: true,
         }

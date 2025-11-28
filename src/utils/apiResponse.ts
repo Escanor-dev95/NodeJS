@@ -1,6 +1,6 @@
 export default class ApiResponse {
 
-    static succes(res : any, data : any, status : number = 200) {
+    static success(res : any, data : any, status : number = 200) {
         return res.status(status).json({
             success: true,
             data: data
@@ -28,5 +28,9 @@ export default class ApiResponse {
 
     static invalidId(res: any) {
         return this.error(res, "Invalid ID format", 400)
+    }
+
+    static conflict(res: any, message: string = "Conflict") {
+        return this.error(res, message, 409);
     }
 }
