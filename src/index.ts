@@ -1,11 +1,11 @@
 import express from 'express';
 import {config} from "dotenv";
 import { connectDB } from "./db";
-import userRoutes from "./routes/users";
+import userRoutes from "./routes/userRoute";
 
 const app = express();
 
-config();
+config({quiet: true});
 
 app.use(express.json());
 

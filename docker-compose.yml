@@ -15,14 +15,19 @@ services:
       - /app/node_modules
     networks:
       - app_network
-    depends_on: # Dépendances de démarrage pour le service
+    depends_on:
       - mongo
 
   mongo:
-    image: mongo:6
+    image: mongo:8
     container_name: mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
     ports:
-      - "${MONGO_PORT}:${MONGO_PORT}"
+      #PORTHOTE/PORTCONTENEUR
+      - "${MONGO_PORT}:27017"
     volumes:
       - mongo_data:/data/db
     networks:
