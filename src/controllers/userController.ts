@@ -15,7 +15,7 @@ export async function getUser(req : any, res: any) : Promise<UserInterface> {
     return userCRUD.getOne(req, res);
 }
 
-export async function createUser(req:any, res:any) {
+export async function createUser(req:any, res:any) : Promise<UserInterface> {
     if(!verifyId(req.body.role)) return ApiResponse.invalidId(res);
 
     const role : RoleInterface | null = await Role.findById(req.body.role);
@@ -25,7 +25,7 @@ export async function createUser(req:any, res:any) {
     return userCRUD.create(req,res);
 }
 
-export async function updateUser(req:any, res:any) {
+export async function updateUser(req:any, res:any) : Promise<UserInterface> {
     if(!verifyId(req.body.role)) return ApiResponse.invalidId(res);
 
     const role : RoleInterface | null = await Role.findById(req.body.role);
@@ -35,6 +35,6 @@ export async function updateUser(req:any, res:any) {
     return userCRUD.update(req,res);
 }
 
-export async function deleteUser(req:any, res:any) {
+export async function deleteUser(req:any, res:any) : Promise<UserInterface> {
     return userCRUD.delete(req,res);
 }
