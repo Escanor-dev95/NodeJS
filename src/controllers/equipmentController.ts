@@ -55,3 +55,21 @@ export async function updateEquipment(req: any, res: any): Promise<EquipmentInte
 export async function deleteEquipment(req: any, res: any) : Promise<EquipmentInterface> {
 	return equipmentCRUD.delete(req, res);
 }
+
+export async function deleteEquipmentBySalle(req: any, res: any): Promise<EquipmentInterface[]> {
+    try {
+        const salleId = req.params.id;
+        if(!verifyId(salleId)) return ApiResponse.invalidId(res);
+
+        const salle : SalleInterface | null = await Salle.findById(salleId);
+        if (!salle) {
+            return ApiResponse.notFound(res, "Salle not found.");
+        }
+
+        const result = await Equipment.deleteMany({ salle: salleId });
+
+        return ApiResponse.success(res, result.deletedCount);
+    } catch (err : any) {
+        return ApiResponse.serverError(res);
+    }
+}
