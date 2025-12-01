@@ -16,7 +16,21 @@ export async function getExercice(req: any, res: any): Promise<ExerciceInterface
 	return exerciceCRUD.getOne(req, res);
 }
 
-// get par equipement et par salle
+export async function getExerciceBySalle(req: any, res: any): Promise<ExerciceInterface[]> {
+    try {
+        const salleId = req.params.id;
+        if(!verifyId(salleId)) return ApiResponse.invalidId(res);
+
+        const salle : SalleInterface | null = await Salle.findById(salleId);
+        if(!salle) return ApiResponse.notFound(res, "No salle found.");
+
+        const exercices : ExerciceInterface[] = await Exercice.find({salle : salleId });
+        if(exercices.length === 0) return ApiResponse.notFound(res, "No exercice found.");
+        return ApiResponse.success(res, exercices);
+    } catch (err : any) {
+        return ApiResponse.serverError(res);
+    }
+}
 
 export async function createExercice(req: any, res: any): Promise<ExerciceInterface> {
     if(!verifyId(req.body.salle)) return ApiResponse.invalidId(res);
@@ -67,4 +81,22 @@ export async function updateExercice(req: any, res: any): Promise<ExerciceInterf
 
 export async function deleteExercice(req: any, res: any) : Promise<ExerciceInterface> {
 	return exerciceCRUD.delete(req, res);
+}
+
+export async function deleteExerciceBySalle(req: any, res: any): Promise<EquipmentInterface[]> {
+    try {
+        const salleId = req.params.id;
+        if(!verifyId(salleId)) return ApiResponse.invalidId(res);
+
+        const salle : SalleInterface | null = await Salle.findById(salleId);
+        if (!salle) {
+            return ApiResponse.notFound(res, "Salle not found.");
+        }
+
+        const result = await Exercice.deleteMany({ salle: salleId });
+
+        return ApiResponse.success(res, result.deletedCount);
+    } catch (err : any) {
+        return ApiResponse.serverError(res);
+    }
 }
