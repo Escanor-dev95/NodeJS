@@ -1,19 +1,19 @@
 import { Schema } from 'mongoose';
 
 export interface RewardInterface {
-	badge_id: Schema.Types.ObjectId;
-	user_id: Schema.Types.ObjectId;
+	badge: Schema.Types.ObjectId;
+	user: Schema.Types.ObjectId;
 }
 
 export function getRewardSchema(): Schema<RewardInterface> {
 	return new Schema<RewardInterface>(
 		{
-			badge_id: {
+			badge: {
 				type: Schema.Types.ObjectId,
 				ref: 'Badge',
 				required: true,
 			},
-			user_id: {
+			user: {
 				type: Schema.Types.ObjectId,
 				ref: 'User',
 				required: true,
