@@ -4,9 +4,9 @@ import {createRole, deleteRole, getRole, getRoles, updateRole} from "../controll
 const router = express.Router();
 
 router.get("/", getRoles);
-router.get("/:id", json() ,getRole);
+router.get("/:id" ,getRole);
 router.post("/", createRole);
-router.put("/:id", json() ,updateRole);
-router.delete("/:id", json() ,deleteRole);
+router.put("/:id" ,updateRole);
+router.delete("/:id",deleteRole);
 
 export default router;
