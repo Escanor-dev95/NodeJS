@@ -15,6 +15,38 @@ export async function getSalle(req: any, res: any): Promise<SalleInterface> {
 	return salleCRUD.getOne(req, res);
 }
 
+export async function getSalleApproved(req: any, res: any): Promise<SalleInterface[]> {
+    try {
+        const sallesApproved : SalleInterface[] = await Salle.find({approved: true});
+        console.log(sallesApproved);
+        if(sallesApproved.length === 0) {
+            return ApiResponse.notFound(res, "No salle approved");
+        }
+        return ApiResponse.success(res, sallesApproved);
+    } catch (err : any) {
+        return ApiResponse.serverError(res);
+    }
+}
+
+export async function approvedSalle(req: any, res: any): Promise<SalleInterface> {
+    try {
+        const id = req.params.id;
+        if(!verifyId(id)) return ApiResponse.invalidId(res);
+
+        const salle : SalleInterface | null = await Salle.findOneAndUpdate(
+            { _id: id, approved: false },
+            { approved: true },
+            { new: true }
+        );
+
+        if (!salle) return ApiResponse.conflict(res, "Salle already approved or not found");
+
+        return ApiResponse.success(res, salle);
+    } catch (err : any) {
+        return ApiResponse.serverError(res);
+    }
+}
+
 export async function createSalle(req: any, res: any): Promise<SalleInterface> {
 
     if(!verifyId(req.body.manager)) return ApiResponse.invalidId(res);
