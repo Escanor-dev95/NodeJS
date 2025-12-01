@@ -1,22 +1,19 @@
-import express, { json } from 'express';
-import {
-    approvedSalle,
-    createSalle,
-    deleteSalle,
-    getSalle,
-    getSalleApproved,
-    getSalles,
-    updateSalle,
-} from '../controllers';
+import express from 'express';
+import { approveSalle, createSalle, deleteSalle, getSalle, getApprovedSalles, getSalles, updateSalle, suggestChallenge, getSuggestedChallenges } from '../controllers';
 
 const router = express.Router();
 
 router.get('/', getSalles);
-router.get("/approved/", getSalleApproved)
-router.get("/:id",getSalle);
-router.post("/", createSalle);
-router.put("/approved/:id", approvedSalle);
-router.put("/:id" ,updateSalle);
-router.delete("/:id",deleteSalle);
+router.get('/approved', getApprovedSalles);
+
+router.post('/', createSalle);
+
+router.put('/approved/:id', approveSalle);
+router.put('/suggest/:id', suggestChallenge);
+router.get('/suggested/:id', getSuggestedChallenges);
+
+router.get('/:id', getSalle);
+router.put('/:id', updateSalle);
+router.delete('/:id', deleteSalle);
 
 export default router;

@@ -3,13 +3,13 @@ import { Schema } from 'mongoose';
 export interface SalleInterface {
 	name: string;
 	address: string;
-    email?: string;
-    phone?: string;
+	email?: string;
+	phone?: string;
 	capacity: number;
 	description: string;
 	approved: boolean;
 	manager: Schema.Types.ObjectId;
-    _id?: string;
+	_id?: Schema.Types.ObjectId;
 }
 
 export function getSalleSchema(): Schema<SalleInterface> {
@@ -23,14 +23,14 @@ export function getSalleSchema(): Schema<SalleInterface> {
 				type: String,
 				required: true,
 			},
-            email: {
-                type: String,
-                required: false,
-            },
-            phone: {
-                type: String,
-                required: false,
-            },
+			email: {
+				type: String,
+				required: false,
+			},
+			phone: {
+				type: String,
+				required: false,
+			},
 			capacity: {
 				type: Number,
 				required: true,

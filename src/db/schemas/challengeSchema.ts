@@ -9,8 +9,9 @@ export interface ChallengeInterface {
 	recommended: boolean;
 	winnable_points: number;
 	salle_id: Schema.Types.ObjectId;
-	user_id: Schema.Types.ObjectId;
+	user_id: string;
 	exercice_id?: Schema.Types.ObjectId;
+	suggested?: boolean;
 }
 
 export function getChallengeSchema(): Schema<ChallengeInterface> {
@@ -48,13 +49,17 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 				required: true,
 			},
 			user_id: {
-				type: Schema.Types.ObjectId,
+				type: String,
 				ref: 'User',
 				required: true,
 			},
 			exercice_id: {
 				type: Schema.Types.ObjectId,
 				ref: 'Exercice',
+			},
+			suggested: {
+				type: Boolean,
+				default: true,
 			},
 		},
 		{
