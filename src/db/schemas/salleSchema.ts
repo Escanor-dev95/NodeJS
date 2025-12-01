@@ -3,6 +3,8 @@ import { Schema } from 'mongoose';
 export interface SalleInterface {
 	name: string;
 	address: string;
+    email?: string;
+    phone?: string;
 	capacity: number;
 	description: string;
 	approved: boolean;
@@ -21,6 +23,14 @@ export function getSalleSchema(): Schema<SalleInterface> {
 				type: String,
 				required: true,
 			},
+            email: {
+                type: String,
+                required: false,
+            },
+            phone: {
+                type: String,
+                required: false,
+            },
 			capacity: {
 				type: Number,
 				required: true,
