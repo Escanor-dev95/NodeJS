@@ -3,10 +3,10 @@ import { Schema } from 'mongoose';
 export interface ExerciceInterface {
 	name: string;
 	description?: string;
-	muscle_group: string;
+	muscle_group: string[];
 	difficulty: string;
-	salle_id: Schema.Types.ObjectId;
-	equipment_id?: Schema.Types.ObjectId;
+    salle: Schema.Types.ObjectId;
+    equipment?: Schema.Types.ObjectId;
 }
 
 export function getExerciceSchema(): Schema<ExerciceInterface> {
@@ -20,19 +20,19 @@ export function getExerciceSchema(): Schema<ExerciceInterface> {
 				type: String,
 			},
 			muscle_group: {
-				type: String,
+				type: [String],
 				required: true,
 			},
 			difficulty: {
 				type: String,
 				required: true,
 			},
-			salle_id: {
+			salle: {
 				type: Schema.Types.ObjectId,
 				ref: 'Salle',
 				required: true,
 			},
-			equipment_id: {
+			equipment: {
 				type: Schema.Types.ObjectId,
 				ref: 'Equipment',
 			},

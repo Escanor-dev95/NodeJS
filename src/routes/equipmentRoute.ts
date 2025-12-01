@@ -1,7 +1,7 @@
 import express from 'express';
 import {
     createEquipment,
-    deleteEquipment,
+    deleteEquipment, deleteEquipmentBySalle,
     getEquipment, getEquipmentBySalle,
     getEquipments,
     updateEquipment,
@@ -14,6 +14,7 @@ router.get('/salle/:id', getEquipmentBySalle);
 router.get("/:id", getEquipment);
 router.post("/", createEquipment);
 router.put("/:id" ,updateEquipment);
+router.delete("/salle/:id", deleteEquipmentBySalle);
 router.delete("/:id",deleteEquipment);
 
 export default router;

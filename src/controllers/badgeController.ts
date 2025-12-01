@@ -12,14 +12,14 @@ export async function getBadge(req: any, res: any): Promise<BadgeInterface> {
 	return badgeCRUD.getOne(req, res);
 }
 
-export async function createBadge(req: any, res: any): Promise<void> {
+export async function createBadge(req: any, res: any): Promise<BadgeInterface> {
 	return badgeCRUD.create(req, res);
 }
 
-export async function updateBadge(req: any, res: any): Promise<void> {
+export async function updateBadge(req: any, res: any): Promise<BadgeInterface> {
 	return badgeCRUD.update(req, res);
 }
 
-export async function deleteBadge(req: any, res: any) {
+export async function deleteBadge(req: any, res: any) : Promise<BadgeInterface> {
 	return badgeCRUD.delete(req, res);
 }
