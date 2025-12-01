@@ -1,4 +1,4 @@
-import express, {json} from "express";
+import express from "express";
 import {getUsers, createUser, updateUser, deleteUser, getUser} from "../controllers/userController";
 
 const router = express.Router();
