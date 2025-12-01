@@ -5,6 +5,7 @@ import userRoutes from "./routes/userRoute";
 import roleRoute from "./routes/roleRoute";
 import salleRoute from "./routes/salleRoute";
 import equipmentRoute from "./routes/equipmentRoute";
+import exerciceRoute from "./routes/exerciceRoute";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use("/users", userRoutes);
 app.use("/roles", roleRoute);
 app.use("/salles", salleRoute);
 app.use("/equipments", equipmentRoute);
+app.use("/exercices", exerciceRoute);
 
 app.listen(process.env.API_PORT, () => {
     console.log(`Server is running on port ${process.env.API_PORT}`);

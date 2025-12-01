@@ -7,6 +7,7 @@ export interface SalleInterface {
 	description: string;
 	approved: boolean;
 	manager: Schema.Types.ObjectId;
+    _id?: string;
 }
 
 export function getSalleSchema(): Schema<SalleInterface> {
