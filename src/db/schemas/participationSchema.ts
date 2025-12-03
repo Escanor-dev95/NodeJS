@@ -26,7 +26,7 @@ export function getParticipationSchema(): Schema<ParticipationInterface> {
 		},
 		{
 			versionKey: false,
-			collection: 'exercices',
+			collection: 'participations',
 			timestamps: {
 				updatedAt: true,
 			},

@@ -1,8 +1,9 @@
 import express, { json } from 'express';
-import { getParticipations } from '../controllers';
+import { createParticipation, getParticipations } from '../controllers';
 
 const router = express.Router();
 
 router.get('/', getParticipations);
+router.post('/', createParticipation);
 
 export default router;

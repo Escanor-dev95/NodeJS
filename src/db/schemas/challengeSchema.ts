@@ -11,7 +11,7 @@ export interface ChallengeInterface {
 	salle_id: Schema.Types.ObjectId;
 	user_id: string;
 	exercice_id?: Schema.Types.ObjectId;
-	suggested?: boolean;
+	approved?: boolean;
 }
 
 export function getChallengeSchema(): Schema<ChallengeInterface> {
@@ -57,9 +57,9 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 				type: Schema.Types.ObjectId,
 				ref: 'Exercice',
 			},
-			suggested: {
+			approved: {
 				type: Boolean,
-				default: true,
+				default: false,
 			},
 		},
 		{

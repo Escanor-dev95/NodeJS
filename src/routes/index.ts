@@ -5,6 +5,7 @@ export * from './salleRoute';
 export * from './equipmentRoute';
 export * from './exerciceRoute';
 export * from './progressionRoute';
+export * from './participationRoute';
 export * from './challengeRoute';
 export * from './rewardRoute';
 export * from './badgeRoute';

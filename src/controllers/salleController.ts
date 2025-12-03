@@ -60,9 +60,8 @@ export async function updateSalle(req: any, res: any): Promise<SalleInterface> {
 	if (!verifyId(req.body.manager)) return ApiResponse.invalidId(res);
 
 	const user: UserInterface | null = await User.findById(req.body.manager);
-	if (!user) {
-		return ApiResponse.notFound(res, 'No user found.');
-	}
+	if (!user) return ApiResponse.notFound(res, 'No user found.');
+
 	return salleCRUD.update(req, res);
 }
 
@@ -86,22 +85,10 @@ export async function suggestChallenge(req: any, res: any): Promise<void> {
 		if (!verifyId(userId)) return ApiResponse.invalidId(res);
 		const user: UserInterface | null = await User.findById(userId);
 		if (!user) return ApiResponse.notFound(res, 'User not found.');
-		user.score += 10;
+		// TODO: check if user is manager/owner of the salle
 		await updateUser({ params: { id: userId }, body: user }, res);
 
 		return createChallenge(req, res);
-	} catch (err: any) {
-		return ApiResponse.serverError(res);
-	}
-}
-
-export async function getSuggestedChallenges(req: any, res: any): Promise<ChallengeInterface[]> {
-	try {
-		const suggestedChallenges: ChallengeInterface[] = await Challenge.find({ suggested: true });
-		if (suggestedChallenges.length === 0) {
-			return ApiResponse.notFound(res, 'No suggested challenges found.');
-		}
-		return ApiResponse.success(res, suggestedChallenges);
 	} catch (err: any) {
 		return ApiResponse.serverError(res);
 	}

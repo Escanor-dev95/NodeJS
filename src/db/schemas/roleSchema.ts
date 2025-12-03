@@ -1,20 +1,26 @@
-import {Schema} from "mongoose";
+import { Schema } from 'mongoose';
 
-export interface RoleInterface {
-    name: string;
+export enum RoleName {
+	admin = 'Admin',
+	manager = 'Manager',
+	customer = 'Customer',
 }
 
-export function getRoleSchema() : Schema<RoleInterface>{
-    return new Schema<RoleInterface>({
-        name : {
-            type : String,
-            required : true,
-        },
-    }, {
-        versionKey : false,
-        collection : "roles",
-        timestamps : {
-            updatedAt: true,
-        }
-    });
+export interface RoleInterface {
+	name: RoleName;
+}
+
+export function getRoleSchema(): Schema<RoleInterface> {
+	return new Schema<RoleInterface>(
+		{
+			name: { type: String, enum: Object.values(RoleName), required: true, unique: true },
+		},
+		{
+			versionKey: false,
+			collection: 'roles',
+			timestamps: {
+				updatedAt: true,
+			},
+		}
+	);
 }
