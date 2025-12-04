@@ -9,3 +9,4 @@ export * from './challengeRoute';
 export * from './rewardRoute';
 export * from './badgeRoute';
 export * from './groupChallengeRoute';
+export * from './participationRoute'

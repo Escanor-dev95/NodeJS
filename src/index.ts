@@ -8,6 +8,8 @@ import equipmentRoute from "./routes/equipmentRoute";
 import exerciceRoute from "./routes/exerciceRoute";
 import badgeRoute from "./routes/badgeRoute";
 import rewardRoute from "./routes/rewardRoute";
+import challengeRoute from "./routes/challengeRoute";
+import participationRoute  from "./routes/participationRoute";
 
 const app = express();
 
@@ -26,6 +28,8 @@ app.use("/equipments", equipmentRoute);
 app.use("/exercices", exerciceRoute);
 app.use("/badges", badgeRoute);
 app.use("/rewards", rewardRoute);
+app.use("/challenges", challengeRoute);
+app.use("/participations", participationRoute);
 
 app.listen(process.env.API_PORT, () => {
     console.log(`Server is running on port ${process.env.API_PORT}`);
