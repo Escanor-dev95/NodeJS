@@ -10,6 +10,7 @@ import badgeRoute from "./routes/badgeRoute";
 import rewardRoute from "./routes/rewardRoute";
 import challengeRoute from "./routes/challengeRoute";
 import participationRoute  from "./routes/participationRoute";
+import progressionRoute from "./routes/progressionRoute";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/badges", badgeRoute);
 app.use("/rewards", rewardRoute);
 app.use("/challenges", challengeRoute);
 app.use("/participations", participationRoute);
+app.use("/progressions", progressionRoute);
 
 app.listen(process.env.API_PORT, () => {
     console.log(`Server is running on port ${process.env.API_PORT}`);

@@ -1,6 +1,8 @@
 import { CrudFactory } from '../utils/crudFactory';
 import { BadgeInterface } from '../db/schemas';
 import Badge from '../models/badgeModel';
+import badgeService from '../services/badgeService';
+import User from '../models/userModel';
 
 const badgeCRUD = new CrudFactory(Badge);
 
@@ -22,4 +24,18 @@ export async function updateBadge(req: any, res: any): Promise<BadgeInterface> {
 
 export async function deleteBadge(req: any, res: any) : Promise<BadgeInterface> {
 	return badgeCRUD.delete(req, res);
+}
+
+export async function recalculateBadges(req: any, res: any): Promise<void> {
+	try {
+		const users = await User.find({}, '_id');
+		const results = [];
+		for (const user of users) {
+			const userResults = await badgeService.recalculateBadgesForUser(user._id.toString());
+			results.push({ userId: user._id, results: userResults });
+		}
+		res.status(200).json({ success: true, data: results });
+	} catch (err: any) {
+		res.status(500).json({ success: false, error: err.message });
+	}
 }

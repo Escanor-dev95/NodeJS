@@ -21,9 +21,9 @@ export async function createParticipation(req: any, res: any): Promise<void> {
 	// on lance les rewards
 	try {
 		const body = req.body || {};
-		const userId = body.user || (result && result._id ? result.user : null) || body.userId || body.user_id;
-		if (userId && body.status && (body.status === 'completed' || body.finished === true)) {
-			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', userId: userId, participationId: (result && result._id) || undefined, challengeId: body.challenge || body.challenge_id });
+		const user_id = body.user || (result && result._id ? result.user : null) || body.user_id || body.user_id;
+		if (user_id && body.status && (body.status === 'completed' || body.finished === true)) {
+			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', user_id: user_id, participationId: (result && result._id) || undefined, challengeId: body.challenge || body.challenge_id });
 		}
 	} catch (err: any) {
 		console.error('Badgdee evaluation error on participation create:', err.message || err);
@@ -38,9 +38,9 @@ export async function updateParticipation(req: any, res: any): Promise<void> {
 	// on lance les rewords
 	try {
 		const body = req.body || {};
-		const userId = body.user || body.user_id;
-		if (userId && (body.status && body.status === 'completed' || body.finished === true)) {
-			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', userId: userId, participationId: req.params.id, challengeId: body.challenge || body.challenge_id });
+		const user_id = body.user || body.user_id;
+		if (user_id && (body.status && body.status === 'completed' || body.finished === true)) {
+			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', user_id: user_id, participationId: req.params.id, challengeId: body.challenge || body.challenge_id });
 		}
 	} catch (err: any) {
 		console.error('Badge evaluation error on participation update:', err.message || err);
@@ -73,11 +73,11 @@ export async function finishParticipation(req: any, res: any) {
 		const points = (challenge && challenge.winnable_points) ? Number(challenge.winnable_points) : 0;
 
 		// metre a jour la progression de l'utilisateur
-		const userId = participation.user_id;
-		let progression: any = await Progression.findOne({ user_id: userId });
+		const user_id = participation.user_id;
+		let progression: any = await Progression.findOne({ user_id: user_id });
 		if (!progression) {
 			// créer une nouvelle progression
-			progression = new Progression({ user_id: userId, score: points, ended_challenges: 1 });
+			progression = new Progression({ user_id: user_id, score: points, ended_challenges: 1 });
 			await progression.save();
 		} else {
 			progression.score = (Number(progression.score) || 0) + points;
@@ -85,9 +85,23 @@ export async function finishParticipation(req: any, res: any) {
 			await progression.save();
 		}
 
-		// trigger evaluation des badges
+		// Déclencher l'évaluation des badges
 		try {
-			await badgeService.evaluateAndAwardBadgesForUser({ type: 'progression', userId: userId.toString(), progressionId: progression._id.toString(), points });
+			// 1. Événement pour les badges liés à CETTE participation spécifique
+			await badgeService.evaluateAndAwardBadgesForUser({
+				type: 'participation',
+				user_id: user_id.toString(),
+				participationId: participation._id.toString(),
+				challengeId: participation.challenge_id.toString(),
+			});
+
+			// 2. Événement pour les badges liés à la progression globale
+			await badgeService.evaluateAndAwardBadgesForUser({
+				type: 'progression',
+				user_id: user_id.toString(),
+				progressionId: progression._id.toString(),
+				points,
+			});
 		} catch (err: any) {
 			console.error('Badge evaluation error after finishing participation:', err.message || err);
 		}

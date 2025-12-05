@@ -1,13 +1,14 @@
+import { BadgeInterface } from '../db/schemas';
+import { ProgressionInterface } from '../db/schemas';
 import Badge from '../models/badgeModel';
 import Reward from '../models/rewardModel';
-import Participation from '../models/participationModel';
 import Progression from '../models/progressionModel';
 import User from '../models/userModel';
 import { Types } from 'mongoose';
 
 export type BadgeEvent = {
 	type: 'participation' | 'progression';
-	userId: string;
+	user_id: string;
 	participationId?: string;
 	progressionId?: string;
 	challengeId?: string;
@@ -23,108 +24,168 @@ export type AwardResult = {
 	reason?: string;
 };
 
-async function awardBadgeToUser(userId: string, badgeId: string, context: any = {}, source: 'system' | 'manual' = 'system'): Promise<AwardResult> {
-	// s'assurer que l'utilisateur et le badge existent
-	const user = await User.findById(userId);
+/**
+ * Attribue un badge à un utilisateur s'il ne le possède pas déjà.
+ * @param user_id - L'ID de l'utilisateur.
+ * @param badgeId - L'ID du badge.
+ * @param context - Données contextuelles à stocker avec la récompense.
+ * @param source - Origine de l'attribution ('system' ou 'manual').
+ * @returns Un objet AwardResult indiquant si la récompense a été créée.
+ */
+async function awardBadgeToUser(user_id: string, badgeId: string, context: any = {}, source: 'system' | 'manual' = 'system'): Promise<AwardResult> {
+	if (!Types.ObjectId.isValid(user_id) || !Types.ObjectId.isValid(badgeId)) {
+		throw new Error('Invalid ObjectId format');
+	}
+
+	const [user, badge] = await Promise.all([User.findById(user_id), Badge.findById(badgeId)]);
+
 	if (!user) throw new Error('User not found');
-	const badge = await Badge.findById(badgeId);
 	if (!badge) throw new Error('Badge not found');
 
 	try {
-		const existing: any = await (Reward as any).findOne({ user: user._id, badge: badge._id });
-		if (existing) {
-			return { badgeId: badgeId, created: false, rewardId: existing._id.toString() };
+		const existingReward = await Reward.findOne({ user: user._id as any, badge: badge._id as any }).lean();
+		if (existingReward) {
+			return { badgeId, created: false, rewardId: existingReward._id.toString() };
 		}
 
-		const reward: any = new Reward({ user: user._id, badge: badge._id, context, source });
-		await reward.save();
-		return { badgeId: badgeId, created: true, rewardId: reward._id.toString() };
+		const reward = await Reward.create({ user: user._id, badge: badge._id, context, source } as any);
+		return { badgeId, created: true, rewardId: (reward as any)._id.toString() };
 	} catch (err: any) {
-		// duplication de clé unique
 		if (err.code === 11000) {
-			const existing: any = await (Reward as any).findOne({ user: userId, badge: badgeId });
-			if (existing) return { badgeId: badgeId, created: false, rewardId: existing._id.toString() };
+			const existingReward = await Reward.findOne({ user: user._id as any, badge: badge._id as any }).lean();
+			if (existingReward) {
+				return { badgeId, created: false, rewardId: existingReward._id.toString() };
+			}
+			return { badgeId, created: false };
 		}
 		throw err;
 	}
 }
 
-async function evaluateBadgeForEvent(badge: any, event: BadgeEvent): Promise<boolean> {
-	// logique pour l'attribution des badges
-	const criteria = badge.criteria || {};
-	const type = criteria.type || badge.type || 'first_completion';
+/**
+ * Route l'évaluation du badge vers la bonne fonction en fonction de son type.
+ */
+async function evaluateBadgeForEvent(badge: BadgeInterface, event: BadgeEvent): Promise<boolean> {
+	// On ne traite que les événements pertinents pour le type de badge
+	if (badge.type !== event.type) {
+		return false;
+	}
 
-	switch (type) {
-		case 'first_completion': {
-			// award when user has at least 1 completed participation or a progression
-			let uid: any = event.userId;
-			if (Types.ObjectId.isValid(event.userId)) uid = new Types.ObjectId(event.userId);
-			const partCount = await Participation.countDocuments({ user_id: uid, finished: true } as any);
-			const progCount = await Progression.countDocuments({ user_id: uid } as any);
-			return partCount + progCount > 0;
-		}
-		case 'n_completions': {
-			const n = (criteria.params && criteria.params.n) || 1;
-			let uid: any = event.userId;
-			if (Types.ObjectId.isValid(event.userId)) uid = new Types.ObjectId(event.userId);
-			const partCount = await Participation.countDocuments({ user_id: uid, finished: true } as any);
-			const progCount = await Progression.countDocuments({ user_id: uid } as any);
-			return partCount + progCount >= n;
-		}
-		case 'specific_challenge': {
-			const target = criteria.params && criteria.params.challengeId;
-			if (!target) return false;
-			if (event.challengeId && event.challengeId.toString() === target.toString()) return true;
-			// vérifier dans la base
-			let uid: any = event.userId;
-			if (Types.ObjectId.isValid(event.userId)) uid = new Types.ObjectId(event.userId);
-			const found = await Participation.findOne({ user_id: uid, challenge_id: target.toString(), finished: true } as any);
-			return !!found;
-		}
+	switch (badge.type) {
+		case 'progression':
+			const userProgression = await Progression.findOne({ user_id: new Types.ObjectId(event.user_id) as any }).lean();
+			if (!userProgression) return false;
+			return evaluateProgressionBadge(badge, userProgression);
+
+		case 'participation':
+			return evaluateParticipationBadge(badge, event);
+
 		default:
-			// critere inconnu
 			return false;
 	}
 }
 
+/**
+ * Évalue un badge de type 'progression'.
+ */
+function evaluateProgressionBadge(badge: BadgeInterface, userProgression: ProgressionInterface): boolean {
+	const { category, criteria, operator } = badge;
+
+	if (!(category in userProgression)) {
+		return false;
+	}
+
+	const userValue = userProgression[category as keyof ProgressionInterface];
+
+	if (userValue === undefined || userValue === null || typeof userValue !== 'number') {
+		return false;
+	}
+
+	switch (operator) {
+		case '>=':
+			return userValue >= criteria;
+		case '<=':
+			return userValue <= criteria;
+		case '==':
+			return userValue === criteria;
+		default:
+			console.warn(`Unknown operator "${operator}" for badge ${badge._id}`);
+			return false;
+	}
+}
+
+/**
+ * Évalue un badge de type 'participation'.
+ */
+function evaluateParticipationBadge(badge: BadgeInterface, event: BadgeEvent): boolean {
+	// Ce badge nécessite-t-il de terminer un challenge spécifique ?
+	if (badge.challenge_id) {
+		// L'événement concerne-t-il le bon challenge ?
+		return badge.challenge_id.toString() === event.challengeId?.toString();
+	}
+	// Logique future : on pourrait vérifier d'autres aspects de la participation ici.
+	return false;
+}
+
+/**
+ * Évalue et attribue tous les badges pertinents pour un utilisateur suite à un événement.
+ * @param event - L'événement déclencheur.
+ */
 export async function evaluateAndAwardBadgesForUser(event: BadgeEvent): Promise<AwardResult[]> {
-	// load candidate badges - for simplicity load all badges
-	const badges = await (Badge as any).find();
+	// Optimisation : On ne charge que les badges pertinents pour le type d'événement.
+	const candidateBadges = await Badge.find({ type: event.type }).lean() as BadgeInterface[];
 	const results: AwardResult[] = [];
 
-	for (const badge of badges) {
+	for (const badge of candidateBadges) {
 		try {
-			const ok = await evaluateBadgeForEvent(badge, event);
-			if (!ok) continue;
-
-			const res = await awardBadgeToUser(event.userId, badge._id.toString(), { event }, 'system');
-			results.push(res);
+			if (await evaluateBadgeForEvent(badge, event)) {
+				const res = await awardBadgeToUser(event.user_id, badge._id.toString(), { event }, 'system');
+				results.push(res);
+			}
 		} catch (err: any) {
-			// log and continue
-			console.error('Error evaluating/awarding badge', badge._id?.toString(), err.message || err);
+			console.error(`Error evaluating/awarding badge ${badge._id?.toString()} for user ${event.user_id}:`, err.message || err);
 		}
 	}
 
 	return results;
 }
 
+/**
+ * Recalcule tous les badges pour un utilisateur donné.
+ * @param user_id - L'ID de l'utilisateur.
+ */
+export async function recalculateBadgesForUser(user_id: string): Promise<AwardResult[]> {
+	const user = await User.findById(user_id).lean();
+	if (!user) {
+		throw new Error('User not found');
+	}
+
+	const event: BadgeEvent = {
+		type: 'progression',
+		user_id: user_id,
+	};
+
+	// On ne recalcule que les badges de progression
+	return evaluateAndAwardBadgesForUser(event);
+}
+
 export async function listBadges() {
-	return (Badge as any).find();
+	return Badge.find().lean();
 }
 
-export async function getUserRewards(userId: string) {
-	return (Reward as any).find({ user: userId }).populate('badge');
+export async function getUserRewards(user_id: string) {
+	return Reward.find({ user: new Types.ObjectId(user_id) as any }).populate('badge').lean();
 }
 
-export async function manualAward(userId: string, badgeCodeOrId: string, context: any = {}) {
-	let badge: any;
+export async function manualAward(user_id: string, badgeCodeOrId: string, context: any = {}) {
+	let badge: BadgeInterface | null;
 	if (Types.ObjectId.isValid(badgeCodeOrId)) {
-		badge = await (Badge as any).findById(badgeCodeOrId);
+		badge = await Badge.findById(badgeCodeOrId).lean() as BadgeInterface | null;
 	} else {
-		badge = await (Badge as any).findOne({ code: badgeCodeOrId });
+		badge = await Badge.findOne({ code: badgeCodeOrId }).lean() as BadgeInterface | null;
 	}
 	if (!badge) throw new Error('Badge not found');
-	return awardBadgeToUser(userId, badge._id.toString(), context, 'manual');
+	return awardBadgeToUser(user_id, badge._id.toString(), context, 'manual');
 }
 
 export default {
@@ -132,4 +193,5 @@ export default {
 	listBadges,
 	getUserRewards,
 	manualAward,
+	recalculateBadgesForUser,
 };
