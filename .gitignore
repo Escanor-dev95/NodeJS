@@ -37,3 +37,5 @@ out/
 # Optional: coverage reports
 coverage/
 .nyc_output/
+# Optional: files
+postman_data.json
