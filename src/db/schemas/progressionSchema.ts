@@ -9,7 +9,7 @@ export interface ProgressionInterface {
 }
 
 export function getProgressionSchema(): Schema<ProgressionInterface> {
-	return new Schema<ProgressionInterface>(
+	const schema = new Schema<ProgressionInterface>(
 		{
 			burned_calories: {
 				type: Number,
@@ -39,4 +39,9 @@ export function getProgressionSchema(): Schema<ProgressionInterface> {
 			},
 		}
 	);
+
+	// on s'assure qu'un utilisateur n'a qu'une seule progression
+	schema.index({ user_id: 1 }, { unique: true });
+
+	return schema;
 }

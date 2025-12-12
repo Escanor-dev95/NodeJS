@@ -1,8 +1,10 @@
-import express, { json } from 'express';
+import express from 'express';
 import { getGroupChallenges } from '../controllers';
+import { authorizeRoles } from '../utils';
 
 const router = express.Router();
 
-router.get('/', getGroupChallenges);
+// Lecture réservée aux utilisateurs connectés
+router.get('/', authorizeRoles(["owner", "customer"]), getGroupChallenges);
 
 export default router;

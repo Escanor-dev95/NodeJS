@@ -6,15 +6,18 @@ import {
     getEquipments,
     updateEquipment,
 } from '../controllers';
+import { authorizeRoles } from '../utils';
 
 const router = express.Router();
 
+// Lecture publique
 router.get('/', getEquipments);
 router.get('/salle/:id', getEquipmentBySalle);
 router.get("/:id", getEquipment);
-router.post("/", createEquipment);
-router.put("/:id" ,updateEquipment);
-router.delete("/salle/:id", deleteEquipmentBySalle);
-router.delete("/:id",deleteEquipment);
+// Gestion des équipements réservée à l'admin
+router.post("/", authorizeRoles(["admin"]), createEquipment);
+router.put("/:id", authorizeRoles(["admin"]), updateEquipment);
+router.delete("/salle/:id", authorizeRoles(["admin"]), deleteEquipmentBySalle);
+router.delete("/:id", authorizeRoles(["admin"]), deleteEquipment);
 
 export default router;

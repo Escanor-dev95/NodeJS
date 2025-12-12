@@ -8,15 +8,18 @@ import {
     getSalles,
     updateSalle,
 } from '../controllers';
+import { authorizeRoles } from '../utils';
 
 const router = express.Router();
 
+// Lecture publique
 router.get('/', getSalles);
 router.get("/approved/", getSalleApproved)
 router.get("/:id",getSalle);
-router.post("/", createSalle);
-router.put("/approved/:id", approvedSalle);
-router.put("/:id" ,updateSalle);
-router.delete("/:id",deleteSalle);
+// Création, modification, suppression, approbation réservées à l'admin
+router.post("/", authorizeRoles(["admin"]), createSalle);
+router.put("/approved/:id", authorizeRoles(["admin"]), approvedSalle);
+router.put("/:id" , authorizeRoles(["admin", "owner"]), updateSalle);
+router.delete("/:id", authorizeRoles(["admin"]), deleteSalle);
 
 export default router;

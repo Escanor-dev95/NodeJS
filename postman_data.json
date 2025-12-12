@@ -1,0 +1,145 @@
+{
+    "roles": [
+    {
+      "name": "admin"
+    },
+    {
+      "name": "owner"
+    },
+    {
+      "name": "customer"
+    }
+  ],
+  "users": [
+    {
+      "name": "Alice Admin",
+      "email": "admin@example.com",
+      "password": "password123",
+      "isActive": true,
+      "score": 100,
+      "role": "<ROLE_ID_ADMIN>"
+    },
+    {
+      "name": "Bob Manager",
+      "email": "manager@example.com",
+      "password": "password123",
+      "isActive": true,
+      "score": 50,
+      "role": "<ROLE_ID_OWNER>"
+    },
+    {
+      "name": "Charlie User",
+      "email": "user@example.com",
+      "password": "password123",
+      "isActive": true,
+      "score": 25,
+      "role": "<ROLE_ID_CUSTOMER>"
+    }
+  ],
+  "salles": [
+    {
+      "name": "FitZone",
+      "address": "123 Fitness St, Gymtown",
+      "email": "contact@fitzone.com",
+      "phone": "123-456-7890",
+      "capacity": 100,
+      "description": "A modern gym with all the latest equipment.",
+      "approved": true,
+      "manager": "<USER_ID_MANAGER>"
+    }
+  ],
+  "equipments": [
+    {
+      "name": "Treadmill",
+      "max_weight": 150,
+      "quantity": 10,
+      "salle": "<SALLE_ID_FITZONE>"
+    },
+    {
+      "name": "Dumbbell Set",
+      "quantity": 20,
+      "salle": "<SALLE_ID_FITZONE>"
+    }
+  ],
+  "exercices": [
+    {
+      "name": "Running",
+      "description": "Running on a treadmill.",
+      "muscle_group": ["legs", "cardio"],
+      "difficulty": "easy",
+      "salle": "<SALLE_ID_FITZONE>",
+      "equipment": "<EQUIPMENT_ID_TREADMILL>"
+    },
+    {
+      "name": "Bicep Curls",
+      "description": "Lifting dumbbells to work the biceps.",
+      "muscle_group": ["arms"],
+      "difficulty": "medium",
+      "salle": "<SALLE_ID_FITZONE>",
+      "equipment": "<EQUIPMENT_ID_DUMBBELLS>"
+    }
+  ],
+  "challenges": [
+    {
+      "title": "Cardio King",
+      "description": "Run 5km on the treadmill.",
+      "difficulty": "medium",
+      "duration": 30,
+      "objectives": ["Run 5km"],
+      "recommended": true,
+      "winnable_points": 100,
+      "salle_id": "<SALLE_ID_FITZONE>",
+      "user_id": "<USER_ID_MANAGER>",
+      "exercice_id": "<EXERCICE_ID_RUNNING>"
+    }
+  ],
+  "participations": [
+    {
+      "user_id": "<USER_ID_CHARLIE>",
+      "challenge_id": "<CHALLENGE_ID_CARDIO_KING>",
+      "finished": false
+    }
+  ],
+  "progressions": [
+    {
+      "user_id": "<USER_ID_CHARLIE>",
+      "burned_calories": 500,
+      "actual_weight": 70,
+      "score": 25,
+      "ended_challenges": 0
+    }
+  ],
+  "badges": [
+    {
+      "name": "First Challenge Completed",
+      "description": "Awarded for completing your first challenge.",
+      "type": "participation",
+      "challenge_id": "<CHALLENGE_ID_CARDIO_KING>",
+      "category": "ended_challenges",
+      "criteria": 1,
+      "operator": "=="
+    },
+    {
+        "name": "Weight Goal",
+        "description": "Reach a weight of 65kg.",
+        "type": "progression",
+        "category": "actual_weight",
+        "criteria": 65,
+        "operator": "<="
+    }
+  ],
+  "rewards": [
+    {
+      "badge": "<BADGE_ID_FIRST_CHALLENGE>",
+      "user": "<USER_ID_CHARLIE>",
+      "context": { "challengeName": "Cardio King" }
+    }
+  ],
+  "groupChallenges": [
+    {
+      "description": "Team challenge for the month of December.",
+      "users_id": ["<USER_ID_CHARLIE>", "<USER_ID_BOB>"]
+    }
+  ]
+}
+
