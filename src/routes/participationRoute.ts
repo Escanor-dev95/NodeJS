@@ -1,14 +1,16 @@
 import express from 'express';
 import { getParticipations, createParticipation, getParticipation, updateParticipation, deleteParticipation, finishParticipation } from '../controllers';
+import { authorizeRoles } from '../utils';
 
 const router = express.Router();
 
-router.get('/', getParticipations);
-router.get('/:id', getParticipation);
-router.post('/', createParticipation);
-router.put('/:id', updateParticipation);
-router.patch('/:id/finish', finishParticipation);
-router.delete('/:id', deleteParticipation);
+// Lecture et création réservées aux utilisateurs connectés (owner, customer)
+router.get('/', authorizeRoles(["owner", "customer"]), getParticipations);
+router.get('/:id', authorizeRoles(["owner", "customer"]), getParticipation);
+router.post('/', authorizeRoles(["owner", "customer"]), createParticipation);
+router.put('/:id', authorizeRoles(["owner", "customer"]), updateParticipation);
+router.patch('/:id/finish', authorizeRoles(["owner", "customer"]), finishParticipation);
+router.delete('/:id', authorizeRoles(["owner", "customer"]), deleteParticipation);
 
 
 export default router;

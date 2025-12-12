@@ -11,6 +11,7 @@ import rewardRoute from "./routes/rewardRoute";
 import challengeRoute from "./routes/challengeRoute";
 import participationRoute  from "./routes/participationRoute";
 import progressionRoute from "./routes/progressionRoute";
+import loginRoute from "./routes/loginRoute";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/rewards", rewardRoute);
 app.use("/challenges", challengeRoute);
 app.use("/participations", participationRoute);
 app.use("/progressions", progressionRoute);
+app.use("/auth", loginRoute);
 
 app.listen(process.env.API_PORT, () => {
     console.log(`Server is running on port ${process.env.API_PORT}`);

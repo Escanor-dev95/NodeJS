@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/app
+      #- .:/app:cached
       - /app/node_modules
     networks:
       - app_network
