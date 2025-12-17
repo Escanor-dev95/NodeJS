@@ -24,14 +24,6 @@ export type AwardResult = {
 	reason?: string;
 };
 
-/**
- * Attribue un badge à un utilisateur s'il ne le possède pas déjà.
- * @param user_id - L'ID de l'utilisateur.
- * @param badgeId - L'ID du badge.
- * @param context - Données contextuelles à stocker avec la récompense.
- * @param source - Origine de l'attribution ('system' ou 'manual').
- * @returns Un objet AwardResult indiquant si la récompense a été créée.
- */
 async function awardBadgeToUser(user_id: string, badgeId: string, context: any = {}, source: 'system' | 'manual' = 'system'): Promise<AwardResult> {
 	if (!Types.ObjectId.isValid(user_id) || !Types.ObjectId.isValid(badgeId)) {
 		throw new Error('Invalid ObjectId format');
@@ -62,9 +54,7 @@ async function awardBadgeToUser(user_id: string, badgeId: string, context: any =
 	}
 }
 
-/**
- * Route l'évaluation du badge vers la bonne fonction en fonction de son type.
- */
+//Route l'évaluation du badge vers la bonne fonction en fonction de son type.
 async function evaluateBadgeForEvent(badge: BadgeInterface, event: BadgeEvent): Promise<boolean> {
 	// On ne traite que les événements pertinents pour le type de badge
 	if (badge.type !== event.type) {
@@ -85,9 +75,7 @@ async function evaluateBadgeForEvent(badge: BadgeInterface, event: BadgeEvent): 
 	}
 }
 
-/**
- * Évalue un badge de type 'progression'.
- */
+//Évalue un badge de type 'progression'
 function evaluateProgressionBadge(badge: BadgeInterface, userProgression: ProgressionInterface): boolean {
 	const { category, criteria, operator } = badge;
 
@@ -114,9 +102,7 @@ function evaluateProgressionBadge(badge: BadgeInterface, userProgression: Progre
 	}
 }
 
-/**
- * Évalue un badge de type 'participation'.
- */
+//Évalue un badge de type 'participation'.
 function evaluateParticipationBadge(badge: BadgeInterface, event: BadgeEvent): boolean {
 	// Ce badge nécessite-t-il de terminer un challenge spécifique ?
 	if (badge.challenge_id) {
@@ -127,10 +113,6 @@ function evaluateParticipationBadge(badge: BadgeInterface, event: BadgeEvent): b
 	return false;
 }
 
-/**
- * Évalue et attribue tous les badges pertinents pour un utilisateur suite à un événement.
- * @param event - L'événement déclencheur.
- */
 export async function evaluateAndAwardBadgesForUser(event: BadgeEvent): Promise<AwardResult[]> {
 	// Optimisation : On ne charge que les badges pertinents pour le type d'événement.
 	const candidateBadges = await Badge.find({ type: event.type }).lean() as BadgeInterface[];
@@ -150,10 +132,6 @@ export async function evaluateAndAwardBadgesForUser(event: BadgeEvent): Promise<
 	return results;
 }
 
-/**
- * Recalcule tous les badges pour un utilisateur donné.
- * @param user_id - L'ID de l'utilisateur.
- */
 export async function recalculateBadgesForUser(user_id: string): Promise<AwardResult[]> {
 	const user = await User.findById(user_id).lean();
 	if (!user) {

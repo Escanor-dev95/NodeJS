@@ -13,6 +13,8 @@ export async function getChallenge(req: any, res: any): Promise<ChallengeInterfa
 }
 
 export async function createChallenge(req: any, res: any): Promise<void> {
+	// On injecte l'id de l'utilisateur qui crée le challenge
+	req.body.user_id = req.user.userId;
 	return challengeCRUD.create(req, res);
 }
 

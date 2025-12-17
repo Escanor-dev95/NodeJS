@@ -1,6 +1,83 @@
 import { Schema } from 'mongoose';
 
 export interface ChallengeInterface {
+    title: string;
+    description?: string;
+    difficulty: number;
+    duration?: number;
+    objectives: string[];
+    calories: number;
+    recommended: boolean;
+    winnable_points: number;
+    salle_id: Schema.Types.ObjectId;
+    user_id: Schema.Types.ObjectId;
+    exercice_id?: Schema.Types.ObjectId;
+}
+
+export function getChallengeSchema(): Schema<ChallengeInterface> {
+    return new Schema<ChallengeInterface>(
+        {
+            title: {
+                type: String,
+                required: true,
+            },
+            description: {
+                type: String,
+            },
+            difficulty: {
+                type: Number,
+                required: true,
+                min: 0,
+                max: 10,
+            },
+            duration: {
+                type: Number,
+            },
+            objectives: {
+                type: [String],
+                required: true,
+            },
+            calories: {
+                type: Number,
+                required: true,
+            },
+            recommended: {
+                type: Boolean,
+                default: false,
+            },
+            winnable_points: {
+                type: Number,
+                required: true,
+            },
+            salle_id: {
+                type: Schema.Types.ObjectId,
+                ref: 'Salle',
+                required: true,
+            },
+            user_id: {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+                required: true,
+            },
+            exercice_id: {
+                type: Schema.Types.ObjectId,
+                ref: 'Exercice',
+            },
+        },
+        {
+            versionKey: false,
+            collection: 'challenges',
+            timestamps: {
+                updatedAt: true,
+            },
+        }
+    );
+}
+
+/*
+import { Schema } from 'mongoose';
+
+export interface ChallengeInterface {
 	title: string;
 	description?: string;
 	difficulty: string;
@@ -66,3 +143,5 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 		}
 	);
 }
+*/
+

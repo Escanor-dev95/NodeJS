@@ -10,7 +10,7 @@ export const login = async (req: Request, res: Response) => {
         if (!email || !password) {
             return ApiResponse.error(res, "Email et mot de passe requis.", 400);
         }
-        // on recherche de l'utilisateur par email et peuplement du rôle
+        // on recherche de l'utilisateur par email avec les rôles du rôle
         const user = await User.findOne({ email }).populate("role");
         if (!user) {
             return ApiResponse.error(res, "Utilisateur non trouvé.", 404);

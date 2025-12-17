@@ -5,7 +5,7 @@ import { authorizeRoles } from '../utils';
 const router = express.Router();
 
 // Lecture et création réservées aux utilisateurs connectés (owner, customer)
-router.get('/', authorizeRoles(["owner", "customer"]), getParticipations);
+router.get('/', getParticipations);
 router.get('/:id', authorizeRoles(["owner", "customer"]), getParticipation);
 router.post('/', authorizeRoles(["owner", "customer"]), createParticipation);
 router.put('/:id', authorizeRoles(["owner", "customer"]), updateParticipation);
