@@ -1,11 +1,14 @@
 import { CrudFactory } from '../utils/crudFactory';
-import { ChallengeInterface } from '../db/schemas';
+import {ChallengeInterface, ExerciceInterface, SalleInterface, UserInterface} from '../db/schemas';
 import Challenge from '../models/challengeModel';
+
 import ApiResponse from '../utils/apiResponse';
 import { verifyId } from '../utils';
 import User from '../models/userModel';
 import Participation from '../models/participationModel';
 import { Types } from 'mongoose';
+import Exercice from "../models/exerciceModel";
+import Salle from "../models/salleModel";
 
 const challengeCRUD = new CrudFactory(Challenge);
 
@@ -13,12 +16,56 @@ export async function getChallenges(req: any, res: any): Promise<ChallengeInterf
 	return challengeCRUD.getAll(req, res);
 }
 
+export async function getPublicChallenges(req: any, res: any): Promise<ChallengeInterface[]> {
+    try {
+        const challenges : ChallengeInterface[] = await Challenge.find({isPublic : true});
+        if(challenges && challenges.length === 0) return ApiResponse.notFound(res, "No challenges found.");
+        return ApiResponse.success(res, challenges);
+    } catch (err : any) {
+        return ApiResponse.serverError(res);
+    }
+}
+
 export async function getChallenge(req: any, res: any): Promise<ChallengeInterface> {
 	return challengeCRUD.getOne(req, res);
 }
 
+export async function getChallengeByUser(req: any, res: any): Promise<ChallengeInterface[]> {
+    try {
+        const userId = req.params.id;
+        if(!verifyId(userId)) return ApiResponse.invalidId(res);
+
+        const user : UserInterface | null = await User.findById(userId);
+        if(!user) return ApiResponse.notFound(res, "No user found.");
+
+        const challenges : ChallengeInterface[] = await Challenge.find({user_id : userId });
+        if(challenges.length === 0) return ApiResponse.notFound(res, "No challenge found.");
+        return ApiResponse.success(res, challenges);
+    } catch (err : any) {
+        return ApiResponse.serverError(res);
+    }
+}
+
 export async function createChallenge(req: any, res: any): Promise<void> {
-	return challengeCRUD.create(req, res);
+    if(!verifyId(req.body.exercice_id)
+        || !verifyId(req.body.salle_id)
+        || !verifyId(req.body.user_id)
+    ) return ApiResponse.invalidId(res);
+
+    const exercice : ExerciceInterface | null = await Exercice.findById(req.body.exercice_id);
+    if(!exercice){
+        return ApiResponse.notFound(res ,"No exercice found.");
+    }
+    const salle : SalleInterface | null = await Salle.findById(req.body.salle_id);
+    if(!salle){
+        return ApiResponse.notFound(res ,"No salle found.");
+    }
+    const user : UserInterface | null = await User.findById(req.body.user_id);
+    if(!user){
+        return ApiResponse.notFound(res ,"No user found.");
+    }
+
+    return challengeCRUD.create(req, res);
 }
 
 export async function updateChallenge(req: any, res: any): Promise<void> {
