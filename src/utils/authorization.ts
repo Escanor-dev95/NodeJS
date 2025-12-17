@@ -21,7 +21,7 @@ export function authorizeRoles(allowedRoles: string[]) {
             if (!allowedRoles.includes(decoded.role)) {
                 return ApiResponse.error(res, "Accès refusé: rôle insuffisant.", 403);
             }
-            // Ajouter les infos utilisateur à la requete pour usage ultérieur
+            // on les infos utilisateur à la requete pour usage ultérieur
             (req as any).user = decoded;
             next();
         } catch (err) {

@@ -38,7 +38,7 @@ export function getBadgeSchema(): Schema<BadgeInterface> {
 				enum: ['burned_calories', 'actual_weight', 'score', 'ended_challenges'],
 			},
 			criteria: {
-				type: Number,
+				type: Number,//10
 				required: true,
 			},
 			operator: {

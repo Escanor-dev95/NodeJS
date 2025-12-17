@@ -26,7 +26,7 @@ export async function createParticipation(req: any, res: any): Promise<void> {
 			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', user_id: user_id, participationId: (result && result._id) || undefined, challengeId: body.challenge || body.challenge_id });
 		}
 	} catch (err: any) {
-		console.error('Badgdee evaluation error on participation create:', err.message || err);
+		console.error('Badge evaluation error on participation create:', err.message || err);
 	}
 
 	return result;
