@@ -80,11 +80,13 @@ import { Schema } from 'mongoose';
 export interface ChallengeInterface {
 	title: string;
 	description?: string;
-	difficulty: string;
+	difficulty: number;
 	duration?: number;
 	objectives: string[];
+    calories: number;
 	recommended: boolean;
 	winnable_points: number;
+    isPublic: boolean;
 	salle_id: Schema.Types.ObjectId;
 	user_id: Schema.Types.ObjectId;
 	exercice_id?: Schema.Types.ObjectId;
@@ -101,8 +103,10 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 				type: String,
 			},
 			difficulty: {
-				type: String,
+				type: Number,
 				required: true,
+                min: 0,
+                max: 10,
 			},
 			duration: {
 				type: Number,
@@ -111,6 +115,10 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 				type: [String],
 				required: true,
 			},
+            calories: {
+                type: Number,
+                required: true,
+            },
 			recommended: {
 				type: Boolean,
 				default: false,
@@ -119,6 +127,10 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 				type: Number,
 				required: true,
 			},
+            isPublic: {
+                type: Boolean,
+                default: false
+            },
 			salle_id: {
 				type: Schema.Types.ObjectId,
 				ref: 'Salle',

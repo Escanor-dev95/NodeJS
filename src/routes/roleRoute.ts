@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", getRoles);
 router.get("/:id" ,getRole);
 // Gestion des rôles réservée à l'admin
-router.post("/", authorizeRoles(["admin"]), createRole);
+router.post("/", createRole);
 router.put("/:id", authorizeRoles(["admin"]), updateRole);
 router.delete("/:id", authorizeRoles(["admin"]), deleteRole);
 
