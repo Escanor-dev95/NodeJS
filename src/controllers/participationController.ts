@@ -1,9 +1,11 @@
 import { CrudFactory } from '../utils/crudFactory';
-import { ParticipationInterface } from '../db/schemas';
+import { ChallengeInterface, ParticipationInterface } from '../db/schemas';
 import Participation from '../models/participationModel';
 import badgeService from '../services/badgeService';
 import Progression from '../models/progressionModel';
 import Challenge from '../models/challengeModel';
+import ApiResponse from '../utils/apiResponse';
+import { verifyId } from '../utils';
 
 const participationCRUD = new CrudFactory(Participation);
 
@@ -15,6 +17,20 @@ export async function getParticipation(req: any, res: any): Promise<Participatio
 	return participationCRUD.getOne(req, res);
 }
 
+export async function getParticipationsByChallenge(req: any, res: any): Promise<ParticipationInterface[]> {
+	const challengeId = req.params.id;
+	if (!challengeId || !verifyId(challengeId)) return ApiResponse.invalidId(res);
+	try {
+		const challenge: ChallengeInterface | null = await Challenge.findById(challengeId);
+		if (!challenge) return ApiResponse.notFound(res, 'No challenge found.');
+		const participations: ParticipationInterface[] = await Participation.find({ challenge_id: challengeId });
+		if (participations && participations.length === 0) return ApiResponse.notFound(res, 'No participations found for this challenge.');
+		return ApiResponse.success(res, participations);
+	} catch (err: any) {
+		return ApiResponse.serverError(res);
+	}
+}
+
 export async function createParticipation(req: any, res: any): Promise<void> {
 	// on creé la participation
 	const result = await participationCRUD.create(req, res);
@@ -23,7 +39,12 @@ export async function createParticipation(req: any, res: any): Promise<void> {
 		const body = req.body || {};
 		const user_id = body.user || (result && result._id ? result.user : null) || body.user_id || body.user_id;
 		if (user_id && body.status && (body.status === 'completed' || body.finished === true)) {
-			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', user_id: user_id, participationId: (result && result._id) || undefined, challengeId: body.challenge || body.challenge_id });
+			await badgeService.evaluateAndAwardBadgesForUser({
+				type: 'participation',
+				user_id: user_id,
+				participationId: (result && result._id) || undefined,
+				challengeId: body.challenge || body.challenge_id,
+			});
 		}
 	} catch (err: any) {
 		console.error('Badge evaluation error on participation create:', err.message || err);
@@ -39,7 +60,7 @@ export async function updateParticipation(req: any, res: any): Promise<void> {
 	try {
 		const body = req.body || {};
 		const user_id = body.user || body.user_id;
-		if (user_id && (body.status && body.status === 'completed' || body.finished === true)) {
+		if (user_id && ((body.status && body.status === 'completed') || body.finished === true)) {
 			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', user_id: user_id, participationId: req.params.id, challengeId: body.challenge || body.challenge_id });
 		}
 	} catch (err: any) {
@@ -62,15 +83,15 @@ export async function finishParticipation(req: any, res: any) {
 		//if (!verifyId(id)) return (res.status(400).json({ success: false, error: 'Invalid ID format' }));
 
 		const participation: any = await Participation.findById(id);
-		if (!participation) return (res.status(404).json({ success: false, error: 'Participation not found' }));
-		if (participation.finished) return (res.status(200).json({ success: true, data: participation }));
+		if (!participation) return res.status(404).json({ success: false, error: 'Participation not found' });
+		if (participation.finished) return res.status(200).json({ success: true, data: participation });
 
 		participation.finished = true;
 		await participation.save();
 
 		// parcourir les challenges pour récupérer les points
 		const challenge: any = await Challenge.findById(participation.challenge_id);
-		const points = (challenge && challenge.winnable_points) ? Number(challenge.winnable_points) : 0;
+		const points = challenge && challenge.winnable_points ? Number(challenge.winnable_points) : 0;
 
 		// metre a jour la progression de l'utilisateur
 		const user_id = participation.user_id;
