@@ -1,12 +1,21 @@
 import express, { json } from 'express';
-import { getChallenges, getChallenge, createChallenge, updateChallenge, deleteChallenge } from '../controllers';
+import {
+    getChallenges,
+    getChallenge,
+    createChallenge,
+    updateChallenge,
+    deleteChallenge,
+    getChallengeByUser, getPublicChallenges
+} from '../controllers';
 import { authorizeRoles } from '../utils';
 
 const router = express.Router();
 
 // Lecture publique
 router.get('/', getChallenges);
+router.get('/public', getPublicChallenges);
 router.get('/:id', getChallenge);
+router.get('/user/:id', getChallengeByUser);
 // Création, modification, suppression : owner (propriétaire) et customer (utilisateur)
 router.post('/', authorizeRoles(["owner", "customer"]), json(), createChallenge);
 router.put('/:id', authorizeRoles(["owner", "customer"]), json(), updateChallenge);
