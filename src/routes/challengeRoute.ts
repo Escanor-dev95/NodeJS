@@ -5,7 +5,7 @@ import {
     createChallenge,
     updateChallenge,
     deleteChallenge,
-    getChallengeByUser
+    getChallengeByUser, getPublicChallenges
 } from '../controllers';
 import { authorizeRoles } from '../utils';
 
@@ -13,6 +13,7 @@ const router = express.Router();
 
 // Lecture publique
 router.get('/', getChallenges);
+router.get('/public', getPublicChallenges);
 router.get('/:id', getChallenge);
 router.get('/user/:id', getChallengeByUser);
 // Création, modification, suppression : owner (propriétaire) et customer (utilisateur)

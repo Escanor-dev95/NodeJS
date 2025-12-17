@@ -13,6 +13,16 @@ export async function getChallenges(req: any, res: any): Promise<ChallengeInterf
 	return challengeCRUD.getAll(req, res);
 }
 
+export async function getPublicChallenges(req: any, res: any): Promise<ChallengeInterface[]> {
+    try {
+        const challenges : ChallengeInterface[] = await Challenge.find({isPublic : true});
+        if(challenges && challenges.length === 0) return ApiResponse.notFound(res, "No challenges found.");
+        return ApiResponse.success(res, challenges);
+    } catch (err : any) {
+        return ApiResponse.serverError(res);
+    }
+}
+
 export async function getChallenge(req: any, res: any): Promise<ChallengeInterface> {
 	return challengeCRUD.getOne(req, res);
 }

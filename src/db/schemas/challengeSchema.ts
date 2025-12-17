@@ -9,6 +9,7 @@ export interface ChallengeInterface {
     calories: number;
 	recommended: boolean;
 	winnable_points: number;
+    isPublic: boolean;
 	salle_id: Schema.Types.ObjectId;
 	user_id: Schema.Types.ObjectId;
 	exercice_id?: Schema.Types.ObjectId;
@@ -49,6 +50,10 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 				type: Number,
 				required: true,
 			},
+            isPublic: {
+                type: Boolean,
+                default: false
+            },
 			salle_id: {
 				type: Schema.Types.ObjectId,
 				ref: 'Salle',
