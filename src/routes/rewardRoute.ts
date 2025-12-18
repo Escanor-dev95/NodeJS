@@ -7,7 +7,8 @@ import {
     updateReward,
     listBadgesHandler,
     getUserRewardsHandler,
-    manualAwardHandler
+    manualAwardHandler,
+    getRewardsByBadge
 } from '../controllers';
 import { authorizeRoles } from '../utils';
 
@@ -17,6 +18,7 @@ const router = express.Router();
 router.get('/', getRewards);
 router.get("/:id" ,getReward);
 router.get('/badges', listBadgesHandler);
+router.get('/badge/:id', getRewardsByBadge);
 router.get('/users/:id/rewards', getUserRewardsHandler);
 // Création, modification, suppression réservées à l'admin
 router.post("/", authorizeRoles(["admin"]), createReward);
