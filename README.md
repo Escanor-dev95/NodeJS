@@ -346,6 +346,10 @@
 
 ## En plus
 
-1. Hashage des mots de passes des comptes utilisateurs
+1. Hashage des mots de passe des comptes utilisateur
 
-2. Gestion des roles avec la restriction des routes via un token de connexion
+2. Gestion des rôles avec la restriction des routes via un token de connexion
+
+3. Mise en ligne de l'API avec gestion de l'environnement via Postman et une variable {{API_URL}}
+  -> lui attribuer comme valeur "https://node.escanordev.fr" ou "http://localhost:3002"
+
