@@ -1,5 +1,7 @@
 # Projet Node JS
 
+L'API a été mise en ligne avec une gestion de l'environnement via Postman et une variable {{API_URL}} -> attribuer comme valeur "https://node.escanordev.fr" ou "http://localhost:3002"
+
 Un utilisateur Admin ayant accès à toutes les routes a été créé sur le serveur, se rendre sur la route "/auth/login" puis se connecter avec email "admin@mail.fr" et password "password", puis mettre le token récupéré dans "Authorization > Bearer Token" sur Postman.
 
 ## Routes disponibles 
@@ -352,7 +354,4 @@ Un utilisateur Admin ayant accès à toutes les routes a été créé sur le ser
 
 2. Gestion des rôles avec la restriction des routes via un token de connexion
 
-3. Mise en ligne de l'API avec gestion de l'environnement via Postman et une variable {{API_URL}}
-  -> lui attribuer comme valeur "https://node.escanordev.fr" ou "http://localhost:3002"
-
-
+3. Mise en ligne de l'API sur un serveur & mise en place du https avec un sous-domaine pointant vers le back-end.
