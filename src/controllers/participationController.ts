@@ -21,8 +21,9 @@ export async function createParticipation(req: any, res: any): Promise<void> {
 	// on lance les rewards
 	try {
 		const body = req.body || {};
-		const user_id = body.user || (result && result._id ? result.user : null) || body.user_id || body.user_id;
-		if (user_id && body.status && (body.status === 'completed' || body.finished === true)) {
+        //const user_id = body.user || (result && result._id ? result.user : null) || body.user_id;
+		const user_id = (result && result._id ? result.user : null) || body.user_id;
+		if (user_id && body.status && ( body.finished === true)) {
 			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', user_id: user_id, participationId: (result && result._id) || undefined, challengeId: body.challenge || body.challenge_id });
 		}
 	} catch (err: any) {
@@ -38,7 +39,7 @@ export async function updateParticipation(req: any, res: any): Promise<void> {
 	// on lance les rewords
 	try {
 		const body = req.body || {};
-		const user_id = body.user || body.user_id;
+		const user_id = body.user_id;
 		if (user_id && (body.status && body.status === 'completed' || body.finished === true)) {
 			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', user_id: user_id, participationId: req.params.id, challengeId: body.challenge || body.challenge_id });
 		}
