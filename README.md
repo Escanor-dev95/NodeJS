@@ -1,5 +1,7 @@
 # Projet Node JS
 
+Un utilisateur Admin ayant accès à toutes les routes a été créé sur le serveur, se rendre sur la route "/auth/login" puis se connecter avec email "admin@mail.fr" et password "password", puis mettre le token récupéré dans "Authorization > Bearer Token" sur Postman.
+
 ## Routes disponibles 
 
 ### ROLES
@@ -352,4 +354,5 @@
 
 3. Mise en ligne de l'API avec gestion de l'environnement via Postman et une variable {{API_URL}}
   -> lui attribuer comme valeur "https://node.escanordev.fr" ou "http://localhost:3002"
+
 
