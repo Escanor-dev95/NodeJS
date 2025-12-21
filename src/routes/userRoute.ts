@@ -11,8 +11,8 @@ router.get('/:id', authorizeRoles(['admin']), getUser);
 // Creation d'utilisateur (inscription) publique
 router.post('/', createUser);
 // Modification réservéea l'admin et au propriétaire du compte
-router.put('/:id', authorizeRoles(['admin', 'owner']), updateUser);
-router.put('/hide/:id', authorizeRoles(['admin']), hideUser);
+router.put('/:id', authorizeRoles(['admin']), updateUser);
+router.patch('/hide/:id', authorizeRoles(['admin', 'owner']), hideUser);
 // Seuls les admins peuvent supprimer un utilisateur
 router.delete('/:id', authorizeRoles(['admin']), deleteUser);
 

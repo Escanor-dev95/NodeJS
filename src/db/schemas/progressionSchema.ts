@@ -5,7 +5,7 @@ export interface ProgressionInterface {
 	actual_weight?: number;
 	score: number;
 	ended_challenges: number;
-	user_id: Schema.Types.ObjectId;
+	user: Schema.Types.ObjectId;
 }
 
 export function getProgressionSchema(): Schema<ProgressionInterface> {
@@ -25,10 +25,11 @@ export function getProgressionSchema(): Schema<ProgressionInterface> {
 				type: Number,
 				required: true,
 			},
-			user_id: {
+			user: {
 				type: Schema.Types.ObjectId,
 				ref: 'User',
 				required: true,
+				unique: true,
 			},
 		},
 		{
@@ -41,7 +42,7 @@ export function getProgressionSchema(): Schema<ProgressionInterface> {
 	);
 
 	// on s'assure qu'un utilisateur n'a qu'une seule progression
-	schema.index({ user_id: 1 }, { unique: true });
+	// schema.index({ user: 1 }, { unique: true });
 
 	return schema;
 }

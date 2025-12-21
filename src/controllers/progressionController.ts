@@ -3,6 +3,8 @@ import { ProgressionInterface } from '../db/schemas';
 import Progression from '../models/progressionModel';
 import badgeService from '../services/badgeService';
 import ApiResponse from '../utils/apiResponse';
+import User from '../models/userModel';
+import { verifyId } from '../utils';
 
 const progressionCRUD = new CrudFactory(Progression);
 export async function getProgressions(req: any, res: any): Promise<ProgressionInterface[]> {
@@ -14,9 +16,9 @@ export async function getProgression(req: any, res: any): Promise<ProgressionInt
 }
 
 export async function getProgressionByUserId(req: any, res: any): Promise<ProgressionInterface[]> {
-	const userId = req.params.userId;
+	const user = req.params.id;
 	try {
-		const progressions = await Progression.find({ user: userId });
+		const progressions = await Progression.find({ user: user });
 		if (!progressions) return ApiResponse.notFound(res, 'User not found.');
 		if (progressions.length === 0) return ApiResponse.notFound(res, 'No progressions found for this user.');
 		return ApiResponse.success(res, progressions);
@@ -26,6 +28,9 @@ export async function getProgressionByUserId(req: any, res: any): Promise<Progre
 }
 
 export async function createProgression(req: any, res: any): Promise<void> {
+	if (!verifyId(req.body.user)) return ApiResponse.invalidId(res);
+	const user = await User.findById(req.body.user);
+	if (!user) return ApiResponse.notFound(res, 'User not found.');
 	const result = await progressionCRUD.create(req, res);
 	try {
 		const body = req.body || {};
@@ -34,12 +39,15 @@ export async function createProgression(req: any, res: any): Promise<void> {
 			await badgeService.evaluateAndAwardBadgesForUser({ type: 'progression', user_id: user_id, progressionId: (result && result._id) || undefined });
 		}
 	} catch (err: any) {
-		console.error('Erreur lor de levaluation de badges create echoué:', err.message || err);
+		console.error("Erreur lors de l'évaluation de badges create echoué:", err.message || err);
 	}
 	return result;
 }
 
 export async function updateProgression(req: any, res: any): Promise<void> {
+	if (!verifyId(req.body.user)) return ApiResponse.invalidId(res);
+	const user = await User.findById(req.body.user);
+	if (!user) return ApiResponse.notFound(res, 'User not found.');
 	const result = await progressionCRUD.update(req, res);
 	try {
 		const body = req.body || {};

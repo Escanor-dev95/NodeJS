@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get('/', getProgressions);
 router.get('/:id', getProgression);
-router.get('/user/:userId', getProgressionByUserId);
+router.get('/user/:id', getProgressionByUserId);
 router.post('/', createProgression);
 router.put('/:id', updateProgression);
 router.delete('/:id', deleteProgression);

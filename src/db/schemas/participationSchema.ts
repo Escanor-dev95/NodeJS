@@ -1,20 +1,20 @@
 import { Schema } from 'mongoose';
 
 export interface ParticipationInterface {
-	user_id: Schema.Types.ObjectId;
-	challenge_id: Schema.Types.ObjectId;
+	user: Schema.Types.ObjectId;
+	challenge: Schema.Types.ObjectId;
 	finished: boolean;
 }
 
 export function getParticipationSchema(): Schema<ParticipationInterface> {
 	return new Schema<ParticipationInterface>(
 		{
-			user_id: {
+			user: {
 				type: Schema.Types.ObjectId,
 				ref: 'User',
 				required: true,
 			},
-			challenge_id: {
+			challenge: {
 				type: Schema.Types.ObjectId,
 				ref: 'Challenge',
 				required: true,

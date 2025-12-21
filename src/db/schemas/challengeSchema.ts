@@ -1,95 +1,19 @@
 import { Schema } from 'mongoose';
 
 export interface ChallengeInterface {
-    title: string;
-    description?: string;
-    difficulty: number;
-    duration?: number;
-    objectives: string[];
-    calories: number;
-    recommended: boolean;
-    winnable_points: number;
-    salle_id: Schema.Types.ObjectId;
-    user_id: Schema.Types.ObjectId;
-    exercice_id?: Schema.Types.ObjectId;
-}
-
-export function getChallengeSchema(): Schema<ChallengeInterface> {
-    return new Schema<ChallengeInterface>(
-        {
-            title: {
-                type: String,
-                required: true,
-            },
-            description: {
-                type: String,
-            },
-            difficulty: {
-                type: Number,
-                required: true,
-                min: 0,
-                max: 10,
-            },
-            duration: {
-                type: Number,
-            },
-            objectives: {
-                type: [String],
-                required: true,
-            },
-            calories: {
-                type: Number,
-                required: true,
-            },
-            recommended: {
-                type: Boolean,
-                default: false,
-            },
-            winnable_points: {
-                type: Number,
-                required: true,
-            },
-            salle_id: {
-                type: Schema.Types.ObjectId,
-                ref: 'Salle',
-                required: true,
-            },
-            user_id: {
-                type: Schema.Types.ObjectId,
-                ref: 'User',
-                required: true,
-            },
-            exercice_id: {
-                type: Schema.Types.ObjectId,
-                ref: 'Exercice',
-            },
-        },
-        {
-            versionKey: false,
-            collection: 'challenges',
-            timestamps: {
-                updatedAt: true,
-            },
-        }
-    );
-}
-
-/*
-import { Schema } from 'mongoose';
-
-export interface ChallengeInterface {
 	title: string;
 	description?: string;
 	difficulty: number;
 	duration?: number;
 	objectives: string[];
-    calories: number;
+	calories: number;
 	recommended: boolean;
 	winnable_points: number;
-    isPublic: boolean;
-	salle_id: Schema.Types.ObjectId;
-	user_id: Schema.Types.ObjectId;
-	exercice_id?: Schema.Types.ObjectId;
+	salle: Schema.Types.ObjectId;
+	user: Schema.Types.ObjectId;
+	exercice?: Schema.Types.ObjectId;
+	approved: boolean;
+	isPublic: boolean;
 }
 
 export function getChallengeSchema(): Schema<ChallengeInterface> {
@@ -105,8 +29,8 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 			difficulty: {
 				type: Number,
 				required: true,
-                min: 0,
-                max: 10,
+				min: 0,
+				max: 10,
 			},
 			duration: {
 				type: Number,
@@ -115,10 +39,18 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 				type: [String],
 				required: true,
 			},
-            calories: {
-                type: Number,
-                required: true,
-            },
+			calories: {
+				type: Number,
+				required: true,
+			},
+			approved: {
+				type: Boolean,
+				default: false,
+			},
+			isPublic: {
+				type: Boolean,
+				default: true,
+			},
 			recommended: {
 				type: Boolean,
 				default: false,
@@ -127,21 +59,17 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 				type: Number,
 				required: true,
 			},
-            isPublic: {
-                type: Boolean,
-                default: false
-            },
-			salle_id: {
+			salle: {
 				type: Schema.Types.ObjectId,
 				ref: 'Salle',
 				required: true,
 			},
-			user_id: {
+			user: {
 				type: Schema.Types.ObjectId,
 				ref: 'User',
 				required: true,
 			},
-			exercice_id: {
+			exercice: {
 				type: Schema.Types.ObjectId,
 				ref: 'Exercice',
 			},
@@ -155,5 +83,3 @@ export function getChallengeSchema(): Schema<ChallengeInterface> {
 		}
 	);
 }
-*/
-

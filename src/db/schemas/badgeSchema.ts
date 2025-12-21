@@ -1,11 +1,11 @@
-import {Schema} from 'mongoose';
+import { Schema } from 'mongoose';
 
 export interface BadgeInterface {
 	_id: Schema.Types.ObjectId;
 	name: string;
 	description: string;
 	type: 'progression' | 'participation'; // Type de badge
-	challenge_id?: Schema.Types.ObjectId; // Optionnel: ID du challenge pour les badges de participation
+	challenge?: Schema.Types.ObjectId; // Optionnel: ID du challenge pour les badges de participation
 	category: 'burned_calories' | 'actual_weight' | 'score' | 'ended_challenges';
 	criteria: number;
 	operator: '>=' | '<=' | '==';
@@ -27,7 +27,7 @@ export function getBadgeSchema(): Schema<BadgeInterface> {
 				required: true,
 				enum: ['progression', 'participation'],
 			},
-			challenge_id: {
+			challenge: {
 				type: Schema.Types.ObjectId,
 				ref: 'Challenge',
 				required: false, // Requis seulement si type='participation'
@@ -38,7 +38,7 @@ export function getBadgeSchema(): Schema<BadgeInterface> {
 				enum: ['burned_calories', 'actual_weight', 'score', 'ended_challenges'],
 			},
 			criteria: {
-				type: Number,//10
+				type: Number, //10
 				required: true,
 			},
 			operator: {

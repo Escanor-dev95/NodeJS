@@ -69,14 +69,10 @@ export async function getRewardsByBadge(req: any, res: any) {
 		if (!badgeId) return ApiResponse.badRequest(res, 'badgeId est requis');
 		if (!verifyId(badgeId)) return ApiResponse.invalidId(res);
 
-		const badgeObjectId = new Schema.Types.ObjectId(badgeId);
-
 		const rewards: RewardInterface[] = await Reward.find({
-			badge: badgeObjectId,
+			badge: badgeId,
 			revoked: false,
-		})
-			.populate('user')
-			.populate('badge');
+		});
 
 		return ApiResponse.success(res, rewards);
 	} catch (err: any) {
@@ -99,15 +95,15 @@ export async function getUserRewardsHandler(req: any, res: any) {
 
 export async function manualAwardHandler(req: any, res: any) {
 	try {
-		const { userId, badgeCode, context } = req.body || {};
-		if (!userId || !badgeCode) return ApiResponse.badRequest(res, 'userId et le badgeCode sont requis');
-		if (!verifyId(userId)) return ApiResponse.invalidId(res);
-		const result = await badgeService.manualAward(userId, badgeCode, context || {});
+		const { user, badge, context } = req.body || {};
+		if (!user || !badge) return ApiResponse.badRequest(res, 'User and badge are required.');
+		if (!verifyId(user)) return ApiResponse.invalidId(res);
+		const result = await badgeService.manualAward(user, badge, context || {});
 		if (result.created) return ApiResponse.success(res, result, 201);
 		return ApiResponse.success(res, result);
 	} catch (err: any) {
 		if (err.message && err.message.indexOf('not found') !== -1) return ApiResponse.notFound(res, err.message);
-		console.error('Erreur dan lattribution du badge mannuel', err.message);
+		console.error("Erreur dans l'attribution du badge manuel", err.message);
 		return ApiResponse.serverError(res);
 	}
 }

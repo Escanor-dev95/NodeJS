@@ -63,7 +63,7 @@ async function evaluateBadgeForEvent(badge: BadgeInterface, event: BadgeEvent): 
 
 	switch (badge.type) {
 		case 'progression':
-			const userProgression = await Progression.findOne({ user_id: new Types.ObjectId(event.user_id) as any }).lean();
+			const userProgression = await Progression.findOne({ user: new Types.ObjectId(event.user_id) as any }).lean();
 			if (!userProgression) return false;
 			return evaluateProgressionBadge(badge, userProgression);
 
@@ -105,9 +105,9 @@ function evaluateProgressionBadge(badge: BadgeInterface, userProgression: Progre
 //Évalue un badge de type 'participation'.
 function evaluateParticipationBadge(badge: BadgeInterface, event: BadgeEvent): boolean {
 	// Ce badge nécessite-t-il de terminer un challenge spécifique ?
-	if (badge.challenge_id) {
+	if (badge.challenge) {
 		// L'événement concerne-t-il le bon challenge ?
-		return badge.challenge_id.toString() === event.challengeId?.toString();
+		return badge.challenge.toString() === event.challengeId?.toString();
 	}
 	// Logique future : on pourrait vérifier d'autres aspects de la participation ici.
 	return false;
@@ -115,7 +115,7 @@ function evaluateParticipationBadge(badge: BadgeInterface, event: BadgeEvent): b
 
 export async function evaluateAndAwardBadgesForUser(event: BadgeEvent): Promise<AwardResult[]> {
 	// Optimisation : On ne charge que les badges pertinents pour le type d'événement.
-	const candidateBadges = await Badge.find({ type: event.type }).lean() as BadgeInterface[];
+	const candidateBadges = (await Badge.find({ type: event.type }).lean()) as BadgeInterface[];
 	const results: AwardResult[] = [];
 
 	for (const badge of candidateBadges) {
@@ -152,15 +152,17 @@ export async function listBadges() {
 }
 
 export async function getUserRewards(user_id: string) {
-	return Reward.find({ user: new Types.ObjectId(user_id) as any }).populate('badge').lean();
+	return Reward.find({ user: new Types.ObjectId(user_id) as any })
+		.populate('badge')
+		.lean();
 }
 
 export async function manualAward(user_id: string, badgeCodeOrId: string, context: any = {}) {
 	let badge: BadgeInterface | null;
 	if (Types.ObjectId.isValid(badgeCodeOrId)) {
-		badge = await Badge.findById(badgeCodeOrId).lean() as BadgeInterface | null;
+		badge = (await Badge.findById(badgeCodeOrId).lean()) as BadgeInterface | null;
 	} else {
-		badge = await Badge.findOne({ code: badgeCodeOrId }).lean() as BadgeInterface | null;
+		badge = (await Badge.findOne({ code: badgeCodeOrId }).lean()) as BadgeInterface | null;
 	}
 	if (!badge) throw new Error('Badge not found');
 	return awardBadgeToUser(user_id, badge._id.toString(), context, 'manual');

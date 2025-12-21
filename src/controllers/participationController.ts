@@ -23,7 +23,7 @@ export async function getParticipationsByChallenge(req: any, res: any): Promise<
 	try {
 		const challenge: ChallengeInterface | null = await Challenge.findById(challengeId);
 		if (!challenge) return ApiResponse.notFound(res, 'No challenge found.');
-		const participations: ParticipationInterface[] = await Participation.find({ challenge_id: challengeId });
+		const participations: ParticipationInterface[] = await Participation.find({ challenge: challengeId });
 		if (participations && participations.length === 0) return ApiResponse.notFound(res, 'No participations found for this challenge.');
 		return ApiResponse.success(res, participations);
 	} catch (err: any) {
@@ -32,18 +32,20 @@ export async function getParticipationsByChallenge(req: any, res: any): Promise<
 }
 
 export async function createParticipation(req: any, res: any): Promise<void> {
+	const challenge = await Challenge.findById(req.body.challenge);
+	if (!challenge) return ApiResponse.notFound(res, 'Challenge not found');
 	// on creé la participation
 	const result = await participationCRUD.create(req, res);
 	// on lance les rewards
 	try {
 		const body = req.body || {};
-		const user_id = body.user || (result && result._id ? result.user : null) || body.user_id || body.user_id;
+		const user_id = body.user || (result && result._id ? result.user : null) || body.user_id;
 		if (user_id && body.status && (body.status === 'completed' || body.finished === true)) {
 			await badgeService.evaluateAndAwardBadgesForUser({
 				type: 'participation',
 				user_id: user_id,
 				participationId: (result && result._id) || undefined,
-				challengeId: body.challenge || body.challenge_id,
+				challengeId: body.challenge,
 			});
 		}
 	} catch (err: any) {
@@ -61,7 +63,7 @@ export async function updateParticipation(req: any, res: any): Promise<void> {
 		const body = req.body || {};
 		const user_id = body.user || body.user_id;
 		if (user_id && ((body.status && body.status === 'completed') || body.finished === true)) {
-			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', user_id: user_id, participationId: req.params.id, challengeId: body.challenge || body.challenge_id });
+			await badgeService.evaluateAndAwardBadgesForUser({ type: 'participation', user_id: user_id, participationId: req.params.id, challengeId: body.challenge || body.challenge });
 		}
 	} catch (err: any) {
 		console.error('Badge evaluation error on participation update:', err.message || err);
@@ -76,13 +78,11 @@ export async function deleteParticipation(req: any, res: any) {
 
 // Un fois qu'une participation est finie, on met a jour la progression de l'utilisateur
 export async function finishParticipation(req: any, res: any) {
+	if (!req.params.id || !verifyId(req.params.id)) return ApiResponse.invalidId(res);
 	try {
 		const id = req.params.id;
-		// valid
-		//const { verifyId } = await import('../utils/verifyId');
-		//if (!verifyId(id)) return (res.status(400).json({ success: false, error: 'Invalid ID format' }));
-
 		const participation: any = await Participation.findById(id);
+
 		if (!participation) return res.status(404).json({ success: false, error: 'Participation not found' });
 		if (participation.finished) return res.status(200).json({ success: true, data: participation });
 
@@ -90,7 +90,7 @@ export async function finishParticipation(req: any, res: any) {
 		await participation.save();
 
 		// parcourir les challenges pour récupérer les points
-		const challenge: any = await Challenge.findById(participation.challenge_id);
+		const challenge: any = await Challenge.findById(participation.challenge);
 		const points = challenge && challenge.winnable_points ? Number(challenge.winnable_points) : 0;
 
 		// metre a jour la progression de l'utilisateur
@@ -113,7 +113,7 @@ export async function finishParticipation(req: any, res: any) {
 				type: 'participation',
 				user_id: user_id.toString(),
 				participationId: participation._id.toString(),
-				challengeId: participation.challenge_id.toString(),
+				challengeId: participation.challenge.toString(),
 			});
 
 			// 2. Événement pour les badges liés à la progression globale
