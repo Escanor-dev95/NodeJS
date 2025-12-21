@@ -1,8 +1,5 @@
 # Projet Node JS
 
-## Présentation
-
-
 ## Routes disponibles 
 
 ### ROLES
@@ -71,6 +68,8 @@
         "password": "password"
     }
     ```
+
+    Pour utiliser les routes restreintes, il faut mettre le token dans postman (type Bearer)
 
 ### SALLES
 
@@ -344,3 +343,9 @@
 6. GET /rewards/badge/:badgeId => Récupérer les récompenses associées au badge
 
 7. GET /rewards/user/:userId => Récupérer les récompenses d'un utilisateur 
+
+## En plus
+
+1. Hashage des mots de passes des comptes utilisateurs
+
+2. Gestion des roles avec la restriction des routes via un token de connexion
